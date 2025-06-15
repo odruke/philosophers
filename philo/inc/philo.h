@@ -54,6 +54,7 @@ typedef enum e_philo_status
     SLEEPING,
     THINKING,
     TAKE_FORK,
+    LEAVE_FORK,
     DIED
 }t_philo_status;
 
@@ -92,7 +93,7 @@ typedef struct s_philo
     int             meals_counter;
     bool            is_full;
     long            last_meal_time;
-    t_fork          fork[2];
+    t_fork          *fork[2];
     pthread_t       thread_id;
     pthread_mutex_t philo_mutex;
     t_data          *data;
@@ -101,6 +102,7 @@ typedef struct s_philo
 struct s_data
 {
     long             nb_philos;
+    long            n_running_philos;
     long             tt_die;
     long             tt_eat;
     long             tt_sleep;
@@ -108,6 +110,7 @@ struct s_data
     long            start_sim;
     bool            end_sim;
     bool            philos_ready;
+    pthread_t       monitor;
     pthread_mutex_t data_mutex;
     pthread_mutex_t print_mutex;
     t_fork          *forks;
@@ -129,12 +132,14 @@ void	start_simulation(t_data *data);
 void	*safe_malloc(size_t bytes, char *file, int line);
 void    safe_thread_handle(pthread_t *thread, void *(*f)(void *), void *data, t_thrhandle codes);
 void	safe_mutex_handle(pthread_mutex_t *mutex, t_thrhandle codes);
-bool	get_bool(pthread_mutex_t *mutex, bool value);
-long	get_long(pthread_mutex_t *mutex, long value);
+bool	get_bool(pthread_mutex_t *mutex, bool *value);
+long	get_long(pthread_mutex_t *mutex, long *value);
 void	set_long(pthread_mutex_t *mutex, long *dest, long value);
 void	set_bool(pthread_mutex_t *mutex, bool *dest, bool value);
 long	get_time(t_timecode code);
 void	better_usleep(long microsec, t_data *data);
 void	print_status(t_philo *philo, t_philo_status status);
+bool	all_philos_running(pthread_mutex_t *mutex, long *philos_runing, long nb_philos);
+void	mutex_is_locked(pthread_mutex_t *mutex, t_philo *philo, char *file, int line);
 
 #endif

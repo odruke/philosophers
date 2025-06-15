@@ -3,12 +3,12 @@
 
 static void assign_forks(t_philo *philo, t_fork *forks, int idx, int nb_philos)
 {
-    philo->fork[0] = forks[(idx +1) % nb_philos];
-    philo->fork[1] = forks[idx];
+    philo->fork[0] = &forks[(idx +1) % nb_philos];
+    philo->fork[1] = &forks[idx];
     if ((idx % 2) == 0)
     {
-        philo->fork[0] = forks[idx];
-        philo->fork[1] = forks[(idx +1) % nb_philos];
+        philo->fork[0] = &forks[idx];
+        philo->fork[1] = &forks[(idx +1) % nb_philos];
     }
 }
 
@@ -23,7 +23,7 @@ static void init_philo(t_data *data)
         data->philos[i].is_full = false;
         data->philos[i].meals_counter = 0;
         data->philos[i].data = data;
-        safe_mutex_handle(&data->philos[i].philo_mutex, (t_thrhandle){INIT, __FILE__, __LINE__});
+        safe_mutex_handle(&data->philos[i].philo_mutex, (t_thrhandle){INIT, __FILE__, __LINE__});//revisar
         assign_forks(&data->philos[i], data->forks, i, data->nb_philos);
     }
 }
@@ -36,10 +36,10 @@ void    fill_data(t_data *data)
     data->limit_meals = -1;
     data->nb_philos = 0;
     data->start_sim = 0;
+    data->n_running_philos = 0;
     data->philos_ready = false;
     data->tt_die = 0;
     data->tt_eat = 0;
-    data->tt_die = 0;
     data->tt_sleep = 0;
 }
 

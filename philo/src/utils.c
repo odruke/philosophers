@@ -1,5 +1,18 @@
 #include "philo.h"
 
+
+bool	all_philos_running(pthread_mutex_t *mutex, long *philos_runing, long nb_philos)
+{
+	bool res;
+
+	res = false;
+	safe_mutex_handle(mutex, (t_thrhandle){LOCK, __FILE__, __LINE__});
+	if (*philos_runing == nb_philos)
+		res = true;
+	safe_mutex_handle(mutex, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
+	return (res);
+}
+
 long	get_time(t_timecode code)
 {
 	struct timeval	tv;
@@ -9,9 +22,9 @@ long	get_time(t_timecode code)
 	if(code == SECOND)
 		return (tv.tv_sec);
 	else if (code == MILISECOND)
-		return ((tv.tv_sec * 1e3) + (tv.tv_usec / 1e3));
+		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 	else if (code == MICROSECOND)
-		return ((tv.tv_sec * 1e6) + tv.tv_usec);
+		return ((tv.tv_sec * 1000000) + tv.tv_usec);
 	else
 		error_handle(ERR_UNKNOWN, (t_errarg){"bad input on get_time", NULL, 0, KILL});
 	return (ERR_UNKNOWN);
@@ -19,23 +32,23 @@ long	get_time(t_timecode code)
 void	better_usleep(long microsec, t_data *data)
 {
 	long	start;
-	// long	elapsed;
-	// long	remaining;
+	long	elapsed;
+	long	remaining;
 
 	start = get_time(MICROSECOND);
 	while ((get_time(MICROSECOND) - start) < microsec)
 	{
-		if(get_bool(&data->data_mutex, data->end_sim))
+		if(get_bool(&data->data_mutex, &data->end_sim))
 			break ;
-		// elapsed = (get_time(MICROSECOND) - start);
-		// remaining = microsec - elapsed;
-		// if (remaining > 1000)
-		// 	usleep(remaining / 2);
-		// else
-		// {
-		// 	while ((get_time(MICROSECOND) - start) < microsec)
-		// 		;
-		// }
+		elapsed = (get_time(MICROSECOND) - start);
+		remaining = microsec - elapsed;
+		if (remaining > 1000)
+			usleep(remaining - 1000);
+		else
+		{
+			while ((get_time(MICROSECOND) - start) < microsec)
+				;
+		}
 	}
 }
 bool	ft_isdigit(int c)
