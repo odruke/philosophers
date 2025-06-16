@@ -1,15 +1,6 @@
 
 #include "philo.h"
 
-// void	mutex_is_locked(pthread_mutex_t *mutex, t_philo *philo, char *file, int line)
-// {
-// 	if (pthread_mutex_trylock(mutex) == EBUSY)
-// 	{
-//     	fprintf(stderr, ">>> philo[%d] mutex still locked at %s:%i!\n", philo->id, file, line);
-// 		return ;
-// 	}
-// 	pthread_mutex_unlock(mutex);
-// }
 void	*single_philo(void *value)
 {
 	t_philo	*philo;
@@ -17,7 +8,7 @@ void	*single_philo(void *value)
 
 	philo = (t_philo *)value;
 	data = philo->data;
-	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time(MILISECOND));
+	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time(MICROSECOND));
 	// mutex_is_locked(&philo->philo_mutex, philo, __FILE__, __LINE__);
 	set_long(&data->data_mutex, &data->n_running_philos, (data->n_running_philos + 1));
 	print_status(philo, TAKE_FORK);
@@ -36,22 +27,23 @@ void	eat_routine(t_philo *philo)
 	print_status(philo, TAKE_FORK);
 	safe_mutex_handle(&philo->fork[1]->fork, (t_thrhandle){LOCK, __FILE__, __LINE__});
 	print_status(philo, TAKE_FORK);
-	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time(MILISECOND));
+	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time(MICROSECOND));
 	// mutex_is_locked(&philo->philo_mutex, philo, __FILE__, __LINE__);
 	// printf("last_meal_time in philo n:%i is %ld\n", philo->id, philo->last_meal_time);
 	// printf("philo n: %i eat at:%ld\n", philo->id, get_time(MILISECOND));
 	philo->meals_counter++;
 	print_status(philo, EATING);
 	better_usleep(data->tt_eat * 1000, data);
-	if (data->limit_meals > 0 && philo->meals_counter == data->limit_meals)
-	{
-		set_bool(&philo->philo_mutex, &philo->is_full, true);
-		// mutex_is_locked(&philo->philo_mutex, philo, __FILE__, __LINE__);
-	}
 	safe_mutex_handle(&philo->fork[0]->fork, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
 	print_status(philo, LEAVE_FORK);
 	safe_mutex_handle(&philo->fork[1]->fork, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
 	print_status(philo, LEAVE_FORK);
+	if (data->limit_meals > 0 && philo->meals_counter == data->limit_meals)
+	{
+		// philo->is_full = true;
+		set_bool(&philo->philo_mutex, &philo->is_full, true);
+		// mutex_is_locked(&philo->philo_mutex, philo, __FILE__, __LINE__);
+	}
 	// printf("philo:%i eat finished\n", philo->id);
 }
 
@@ -88,7 +80,7 @@ void	*simulation(void *value)
 	data = philo->data;
 	while (!get_bool(&data->data_mutex, &data->philos_ready))
 		usleep(0);
-	set_long(&philo->philo_mutex, &philo->last_meal_time, data->start_sim);
+	set_long(&philo->philo_mutex, &philo->last_meal_time, get_time(MICROSECOND));
 	set_long(&data->data_mutex, &data->n_running_philos, (data->n_running_philos + 1));
 	while (!get_bool(&data->data_mutex, &data->end_sim))
 	{
@@ -116,11 +108,11 @@ bool	philo_died(t_philo *philo)
 	if (get_bool(&philo->philo_mutex, &philo->is_full))
 		return (false);
 	safe_mutex_handle(&philo->philo_mutex, (t_thrhandle){LOCK, __FILE__, __LINE__});
-	elapsed = get_time(MILISECOND) - philo->last_meal_time;
+	elapsed = get_time(MICROSECOND) - philo->last_meal_time;
 	// printf("time elapsed in philo died %ld\n", elapsed);
 	// printf("last_meal_time in philo n: %i = %ld\n", philo->id, philo->last_meal_time);
 	safe_mutex_handle(&philo->philo_mutex, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
-	if (elapsed > philo->data->tt_die)
+	if (elapsed > (philo->data->tt_die * 1000))
 		return (true);
 	return (false);
 }
@@ -133,12 +125,15 @@ void	*death_monitor(void *value)
 	data = (t_data *)value;
 	while (!all_philos_running(&data->data_mutex, &data->n_running_philos, data->nb_philos))
 		usleep(0) ;
+	// while (!get_bool(&data->data_mutex, &data->philos_ready))
+	// 	usleep(0);
+	// usleep(data->tt_die - 100);
 	while (!get_bool(&data->data_mutex, &data->end_sim))
 	{
 		i = -1;
-		while (++i < data->nb_philos && !get_bool(&data->data_mutex, &data->end_sim))
+		while (++i < data->nb_philos/* && !get_bool(&data->data_mutex, &data->end_sim)*/)
 		{
-			if (philo_died(&data->philos[i]))
+			if (philo_died(&data->philos[i])/* && all_philos_running(&data->data_mutex, &data->n_running_philos, data->nb_philos)*/)
 			{
 				print_status(&data->philos[i], DIED);
 				set_bool(&data->data_mutex, &data->end_sim, true);
@@ -161,9 +156,12 @@ void	start_simulation(t_data *data)
 		while (++i < data->nb_philos)
 			safe_thread_handle(&data->philos[i].thread_id, simulation, &data->philos[i], (t_thrhandle){CREATE, __FILE__, __LINE__});
 	}
-	safe_thread_handle(&data->monitor, death_monitor, data, (t_thrhandle){CREATE, __FILE__, __LINE__});
-	set_long(&data->data_mutex, &data->start_sim, get_time(MILISECOND));
+
+	set_long(&data->data_mutex, &data->start_sim, get_time(MICROSECOND));
 	set_bool(&data->data_mutex, &data->philos_ready, true);
+	safe_thread_handle(&data->monitor, death_monitor, data, (t_thrhandle){CREATE, __FILE__, __LINE__});
+
+
 	// data->start_sim = get_time(MILISECOND);
 	i = -1;
 	while (++i < data->nb_philos)
