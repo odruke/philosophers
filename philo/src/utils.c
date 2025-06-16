@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                         ::::::::           */
+/*   utils.c                                             :+:    :+:           */
+/*                                                      +:+                   */
+/*   By: odruke-s <marvin@42.fr>                       +#+                    */
+/*                                                    +#+                     */
+/*   Created: 2025/06/16 13:56:04 by odruke-s       #+#    #+#                */
+/*   Updated: 2025/06/16 13:58:11 by odruke-s       ########   odam.nl        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-
-bool	all_philos_running(pthread_mutex_t *mutex, long *philos_runing, long nb_philos)
+bool	all_philos_running(pthread_mutex_t *mutex,
+			long *philos_runing, long nb_philos)
 {
-	bool res;
+	bool	res;
 
 	res = false;
 	safe_mutex_handle(mutex, (t_thrhandle){LOCK, __FILE__, __LINE__});
@@ -18,17 +30,20 @@ long	get_time(t_timecode code)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL))
-		error_handle(ERR_UNKNOWN, (t_errarg){"gettimeofday failed", NULL, 0, KILL});
-	if(code == SECOND)
+		error_handle(ERR_UNKNOWN,
+			(t_errarg){"gettimeofday failed", NULL, 0, KILL});
+	if (code == SECOND)
 		return (tv.tv_sec);
 	else if (code == MILISECOND)
 		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 	else if (code == MICROSECOND)
 		return ((tv.tv_sec * 1000000) + tv.tv_usec);
 	else
-		error_handle(ERR_UNKNOWN, (t_errarg){"bad input on get_time", NULL, 0, KILL});
+		error_handle(ERR_UNKNOWN,
+			(t_errarg){"bad input on get_time", NULL, 0, KILL});
 	return (ERR_UNKNOWN);
 }
+
 void	better_usleep(long microsec, t_data *data)
 {
 	long	start;
@@ -38,7 +53,7 @@ void	better_usleep(long microsec, t_data *data)
 	start = get_time(MICROSECOND);
 	while ((get_time(MICROSECOND) - start) < microsec)
 	{
-		if(get_bool(&data->data_mutex, &data->end_sim))
+		if (get_bool(&data->data_mutex, &data->end_sim))
 			break ;
 		elapsed = (get_time(MICROSECOND) - start);
 		remaining = microsec - elapsed;
@@ -51,6 +66,7 @@ void	better_usleep(long microsec, t_data *data)
 		}
 	}
 }
+
 bool	ft_isdigit(int c)
 {
 	if (c >= '0' && c <= '9')
@@ -61,28 +77,28 @@ bool	ft_isdigit(int c)
 
 bool    is_all_nb(int ac, char **av)
 {
-    int i;
-    int b;
+	int	i;
+	int	b;
 
-    i = 1;
-    while (i < ac)
-    {
-        b = 0;
-        while (av[i][b])
-        {
-            if (av[i][b] < '0' || av[i][b] > '9')
-                return (false);
-            b++;
-        }
-        i++;
-    }
-    return (true);
+	i = 1;
+	while (i < ac)
+	{
+		b = 0;
+		while (av[i][b])
+		{
+			if (av[i][b] < '0' || av[i][b] > '9')
+				return (false);
+			b++;
+		}
+		i++;
+	}
+	return (true);
 }
 
 long	ft_atol(const char *nb)
 {
 	long long	res;
-	int		i;
+	int			i;
 
 	res = 0;
 	i = 0;

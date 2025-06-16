@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error_handle.c                                     :+:      :+:    :+:   */
+/*   error_handle.c                                      :+:    :+:           */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lomorale <lomorale@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:26:24 by odruke-s          #+#    #+#             */
-/*   Updated: 2025/04/26 10:25:24 by lomorale         ###   ########.fr       */
+/*   Updated: 2025/06/16 13:23:18 by odruke-s       ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,24 @@ char	*mutex_error(int status)
 {
 	if (status == EINVAL)
 		return ("The value at mutex or atrr is invalid");
-	else if	(status == EDEADLK)
-		return ("A deadlock would occur if the thread blocked waiting for mutex");
+	else if (status == EDEADLK)
+		return ("A deadlock would occur if the thread blocked waiting for \
+				mutex");
 	else if (status == EPERM)
 		return ("The current thread does not hold a lock on mutex");
 	else if (status == ENOMEM)
-		return ("The process cannot allocate enough memory to create another mutex");
+		return ("The process cannot allocate enough memory to create \
+				another mutex");
 	else if (status == EBUSY)
 		return ("Mutex is locked");
 	return (NULL);
 }
+
 char	*thread_error(int status, int code)
 {
 	if (status == EINVAL && code == CREATE)
 		return ("Invalid settings in attr");
-	else if(status == EINVAL && code == JOIN)
+	else if (status == EINVAL && code == JOIN)
 		return ("thread is not a joinable thread or another \
 			thread is already waiting to join with this thread");
 	else if (status == EAGAIN)
@@ -39,7 +42,7 @@ char	*thread_error(int status, int code)
 		return ("Atrr does not have appropiate permission");
 	else if (status == ESRCH)
 		return ("No thread with the ID thread could be found");
-	else if	(status == EDEADLK)
+	else if (status == EDEADLK)
 		return ("A deadlock was detected ");
 	return (NULL);
 }
@@ -49,14 +52,15 @@ void	free_table(void **table)
 	int	i;
 
 	i = -1;
-	while(table[++i])
+	while (table[++i])
 		free(table[i]);
 	free(table);
 	table = NULL;
 }
+
 void	free_data(t_data *data)
 {
-	int i;
+	int	i;
 
 	if (data)
 	{
@@ -64,18 +68,22 @@ void	free_data(t_data *data)
 		{
 			i = -1;
 			while (++i < data->nb_philos)
-				safe_mutex_handle(&data->philos[i].philo_mutex, (t_thrhandle){DESTROY, __FILE__, __LINE__});
+				safe_mutex_handle(&data->philos[i].philo_mutex,
+					(t_thrhandle){DESTROY, __FILE__, __LINE__});
 			free(data->philos);
 		}
 		if (data->forks)
 		{
 			i = -1;
 			while (++i < data->nb_philos)
-				safe_mutex_handle(&data->forks[i].fork, (t_thrhandle){DESTROY, __FILE__, __LINE__});
+				safe_mutex_handle(&data->forks[i].fork,
+					(t_thrhandle){DESTROY, __FILE__, __LINE__});
 			free(data->forks);
 		}
-		safe_mutex_handle(&data->data_mutex, (t_thrhandle){DESTROY, __FILE__, __LINE__});
-		safe_mutex_handle(&data->print_mutex, (t_thrhandle){DESTROY, __FILE__, __LINE__});
+		safe_mutex_handle(&data->data_mutex,
+			(t_thrhandle){DESTROY, __FILE__, __LINE__});
+		safe_mutex_handle(&data->print_mutex,
+			(t_thrhandle){DESTROY, __FILE__, __LINE__});
 		free(data);
 	}
 }
@@ -85,8 +93,8 @@ const t_errinfo	*get_errinfo(t_error error)
 	static t_errinfo	errtab[ERR_UNKNOWN + 1];
 
 	errtab[ERR_BAD_ARGS] = (t_errinfo){ERR_BAD_ARGS, EXIT_FAILURE,
-		"Usage:\nNumber of philosophers | time to die | time to eat | \
-time to sleep || Optional: nummber of times philosopher must eat\n"};
+		"Usage:\n[Number of philosophers] [time to die] [time to eat] \
+[time to sleep] || Optional: [nummber of times philosopher must eat]\n"};
 	errtab[ERR_NO_NUMBER] = (t_errinfo){ERR_NO_NUMBER, EXIT_FAILURE,
 		"Invalid input: all arguments must be unsigned integers\n"};
 	errtab[ERR_MALLOC] = (t_errinfo){ERR_MALLOC, EXIT_FAILURE,
@@ -116,7 +124,8 @@ int	error_handle(t_error error, t_errarg err_args)
 	if (!err_args.extra)
 		printf(err_info->str_format, err_args.cmd, err_args.code);
 	else
-		printf(err_info->str_format, err_args.cmd, err_args.extra, err_args.code);
+		printf(err_info->str_format, err_args.cmd, err_args.extra,
+			err_args.code);
 	if (err_args.terminate)
 	{
 		free_data(data);

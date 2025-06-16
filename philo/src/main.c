@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                         ::::::::           */
+/*   main.c                                              :+:    :+:           */
+/*                                                      +:+                   */
+/*   By: odruke-s <marvin@42.fr>                       +#+                    */
+/*                                                    +#+                     */
+/*   Created: 2025/06/16 13:31:35 by odruke-s       #+#    #+#                */
+/*   Updated: 2025/06/16 13:32:00 by odruke-s       ########   odam.nl        */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "philo.h"
 
@@ -12,20 +23,17 @@ t_data	*recover_data_address(t_data *data)
 	return (stock_data);
 }
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
-    t_data  *data;
+	t_data	*data;
 
-    input_validation(ac, av);
-    data = (t_data *)safe_malloc(sizeof(t_data), __FILE__, __LINE__);
-    // data = (t_data *)malloc(sizeof(t_data));
-    // if (!data)
-    //     error_handle(ERR_MALLOC, "data", "main.c:28",0, KILL);
-    recover_data_address(data);
-    fill_data(data);
-    parsing(data, av);
-    init_data(data);
-    start_simulation(data);
-    free_data(data);
-    return (EXIT_SUCCESS);
+	input_validation(ac, av);
+	data = (t_data *)safe_malloc(sizeof(t_data), __FILE__, __LINE__);
+	recover_data_address(data);
+	fill_data(data);
+	parsing(data, av);
+	init_data(data);
+	start_simulation(data);
+	free_data(data);
+	return (EXIT_SUCCESS);
 }
