@@ -45,3 +45,10 @@ long	get_long(pthread_mutex_t *mutex, long *value)
 	safe_mutex_handle(mutex, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
 	return (res);
 }
+
+void	increment_long(pthread_mutex_t *mutex, long *value)
+{
+	safe_mutex_handle(mutex, (t_thrhandle){LOCK, __FILE__, __LINE__});
+	*value = *value + 1;
+	safe_mutex_handle(mutex, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
+}

@@ -58,7 +58,7 @@ void	better_usleep(long microsec, t_data *data)
 		elapsed = (get_time(MICROSECOND) - start);
 		remaining = microsec - elapsed;
 		if (remaining > 1000)
-			usleep(remaining - 1000);
+			usleep(remaining / 2);
 		else
 		{
 			while ((get_time(MICROSECOND) - start) < microsec)
@@ -116,4 +116,17 @@ long	ft_atol(const char *nb)
 	if (res > LONG_MAX)
 		return (-1);
 	return ((long)res);
+}
+
+bool	all_philos_are_full(t_data *data)
+{
+	t_philo	*philos;
+	int		i;
+
+	philos = data->philos;
+	i = -1;
+	while (++i < data->nb_philos)
+		if (!get_bool(&philos[i].philo_mutex, &philos[i].is_full))
+			return (false);
+	return (true);
 }

@@ -147,9 +147,11 @@ bool	get_bool(pthread_mutex_t *mutex, bool *value);
 long	get_long(pthread_mutex_t *mutex, long *value);
 void	set_long(pthread_mutex_t *mutex, long *dest, long value);
 void	set_bool(pthread_mutex_t *mutex, bool *dest, bool value);
+void	increment_long(pthread_mutex_t *mutex, long *value);
 long	get_time(t_timecode code);
 void	better_usleep(long microsec, t_data *data);
 void	print_status(t_philo *philo, t_philo_status status);
+bool	all_philos_are_full(t_data *data);
 bool	all_philos_running(pthread_mutex_t *mutex, long *philos_runing,
 			long nb_philos);
 void	mutex_is_locked(pthread_mutex_t *mutex, t_philo *philo,

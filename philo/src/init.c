@@ -34,6 +34,7 @@ static void	init_philo(t_data *data)
 		data->philos[i].is_full = false;
 		data->philos[i].meals_counter = 0;
 		data->philos[i].data = data;
+		data->philos[i].last_meal_time = 0;
 		safe_mutex_handle(&data->philos[i].philo_mutex,
 			(t_thrhandle){INIT, __FILE__, __LINE__});//revisar
 		assign_forks(&data->philos[i], data->forks, i, data->nb_philos);
