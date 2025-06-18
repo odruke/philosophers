@@ -60,30 +60,20 @@ void	think_routine(t_philo *philo)//to test
 {
 	t_data	*data;
 	long	tt_think;
-	long	time_until_death;
-	// long	last_meal;
-	// long	t_die;
+	long	t_sleep;
+	long	t_eat;
+
 	data = philo->data;
-    // if (data->nb_philos % 2 == 0)
-    //     tt_think = (data->tt_eat + data->tt_sleep) / 2;
-    // else
-    //     tt_think = (data->tt_eat + data->tt_sleep) / 3;
-
-    // // Add a small stagger based on the philosopher's ID to reduce contention
-    // tt_think += (philo->id % 2) * 10;
-
-    // // Ensure the philosopher doesn't think too long and risk starvation
-    // if (tt_think > data->tt_die / 2)
-	// 	tt_think = data->tt_die / 2;
-
-    // Calculate the time remaining until the philosopher dies
-    time_until_death = (philo->last_meal_time + (data->tt_die * 1000)) - get_time(MICROSECOND);
-	tt_think = time_until_death / 2;
-    // Ensure the think time is not negative or too short
-    if (tt_think < 0)
+	t_sleep = data->tt_sleep * 1000;
+	t_eat = data->tt_eat * 1000;
+	tt_think = 0;
+	if (!(data->nb_philos % 2))
+		return (print_status(philo, THINKING), better_usleep(tt_think, data));
+	tt_think = t_eat * 2 - t_sleep;
+	if (tt_think < 0)
 		tt_think = 0;
 	print_status(philo, THINKING);
-	better_usleep(tt_think, data);
+	better_usleep(tt_think * 0.60, data);
 }
 
 
@@ -99,6 +89,9 @@ void	*simulation(void *value)
 	increment_long(&data->data_mutex, &data->n_running_philos);
 	while (!all_philos_running(&data->data_mutex, &data->n_running_philos, data->nb_philos)) //mutex correcto?
 		usleep(0) ;
+	if ((data->nb_philos % 2))
+		if (!(philo->id % 2))
+			better_usleep(3000, data);
 	while (!get_bool(&data->data_mutex, &data->end_sim))
 	{
 		eat_routine(philo);
@@ -169,6 +162,7 @@ void	start_simulation(t_data *data)
 	{
 		while (++i < data->nb_philos)
 			safe_thread_handle(&data->philos[i].thread_id, simulation, &data->philos[i], (t_thrhandle){CREATE, __FILE__, __LINE__});
+
 	}
 	set_long(&data->data_mutex, &data->start_sim, get_time(MICROSECOND));
 	set_bool(&data->data_mutex, &data->philos_ready, true);
