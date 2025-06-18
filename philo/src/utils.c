@@ -1,29 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                         ::::::::           */
-/*   utils.c                                             :+:    :+:           */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                      +:+                   */
 /*   By: odruke-s <marvin@42.fr>                       +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2025/06/16 13:56:04 by odruke-s       #+#    #+#                */
-/*   Updated: 2025/06/16 13:58:11 by odruke-s       ########   odam.nl        */
+/*   Updated: 2025/06/18 22:30:53 by odruke-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-bool	all_philos_running(pthread_mutex_t *mutex,
-			long *philos_runing, long nb_philos)
-{
-	bool	res;
-
-	res = false;
-	safe_mutex_handle(mutex, (t_thrhandle){LOCK, __FILE__, __LINE__});
-	if (*philos_runing == nb_philos)
-		res = true;
-	safe_mutex_handle(mutex, (t_thrhandle){UNLOCK, __FILE__, __LINE__});
-	return (res);
-}
 
 long	get_time(t_timecode code)
 {
@@ -75,7 +62,7 @@ bool	ft_isdigit(int c)
 		return (false);
 }
 
-bool    is_all_nb(int ac, char **av)
+bool	is_all_nb(int ac, char **av)
 {
 	int	i;
 	int	b;
@@ -116,17 +103,4 @@ long	ft_atol(const char *nb)
 	if (res > LONG_MAX)
 		return (-1);
 	return ((long)res);
-}
-
-bool	all_philos_are_full(t_data *data)
-{
-	t_philo	*philos;
-	int		i;
-
-	philos = data->philos;
-	i = -1;
-	while (++i < data->nb_philos)
-		if (!get_bool(&philos[i].philo_mutex, &philos[i].is_full))
-			return (false);
-	return (true);
 }

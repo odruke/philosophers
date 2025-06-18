@@ -15,7 +15,8 @@ OBJ_DIR = $(SRC_DIR)target/
 INC_DIR = ./inc/
 
 # files
-FILES = main.c error_handle.c parsing.c utils.c simulation.c safe_functions.c init.c setters_getters.c print_functions.c
+FILES = main.c error_handle.c parsing.c utils.c simulation.c safe_functions.c \
+		init.c setters_getters.c print_functions.c free_data.c routines.c simulation_helpers.c
 INC_FILES = philo.h
 
 SRC = $(addprefix $(SRC_DIR), $(FILES))

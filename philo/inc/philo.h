@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                         ::::::::           */
-/*   philo.h                                             :+:    :+:           */
+/*   philo.h                                            :+:      :+:    :+:   */
 /*                                                      +:+                   */
 /*   By: odruke-s <marvin@42.fr>                       +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2025/06/16 12:56:03 by odruke-s       #+#    #+#                */
-/*   Updated: 2025/06/16 13:16:32 by odruke-s       ########   odam.nl        */
+/*   Updated: 2025/06/18 21:28:18 by odruke-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ typedef enum e_error
 	ERR_THREAD,
 	ERR_VOID,
 	ERR_UNKNOWN
-}t_error;
+}	t_error;
 
 typedef enum e_timecode
 {
 	SECOND,
 	MILISECOND,
 	MICROSECOND
-}t_timecode;
+}	t_timecode;
 
 typedef enum e_pthcode
 {
@@ -57,7 +57,7 @@ typedef enum e_pthcode
 	DESTROY,
 	JOIN,
 	DETACH
-}t_pthcode;
+}	t_pthcode;
 
 typedef enum e_philo_status
 {
@@ -67,14 +67,14 @@ typedef enum e_philo_status
 	TAKE_FORK,
 	LEAVE_FORK,
 	DIED
-}t_philo_status;
+}	t_philo_status;
 
 typedef struct s_thrhandle
 {
 	t_pthcode	pthcode;
 	char		*file;
 	int			line;
-}t_thrhandle;
+}	t_thrhandle;
 
 typedef struct s_errarg
 {
@@ -82,20 +82,20 @@ typedef struct s_errarg
 	char	*extra;
 	int		code;
 	int		terminate;
-}t_errarg;
+}	t_errarg;
 
 typedef struct s_errinfo
 {
 	t_error		error;
 	int			exit_code;
 	const char	*str_format;
-}t_errinfo;
+}	t_errinfo;
 
 typedef struct s_fork
 {
 	pthread_mutex_t	fork;
 	int				fork_id;
-}t_fork;
+}	t_fork;
 
 typedef struct s_philo
 {
@@ -107,7 +107,7 @@ typedef struct s_philo
 	pthread_t		thread_id;
 	pthread_mutex_t	philo_mutex;
 	t_data			*data;
-}t_philo;
+}	t_philo;
 
 struct s_data
 {
@@ -152,6 +152,11 @@ long	get_time(t_timecode code);
 void	better_usleep(long microsec, t_data *data);
 void	print_status(t_philo *philo, t_philo_status status);
 bool	all_philos_are_full(t_data *data);
+void	eat_routine(t_philo *philo);
+void	sleep_routine(t_philo *philo);
+void	think_routine(t_philo *philo);
+void	*simulation(void *value);
+void	launch_philos(t_data *data);
 bool	all_philos_running(pthread_mutex_t *mutex, long *philos_runing,
 			long nb_philos);
 void	mutex_is_locked(pthread_mutex_t *mutex, t_philo *philo,

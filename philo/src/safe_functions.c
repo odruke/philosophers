@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                         ::::::::           */
-/*   safe_functions.c                                    :+:    :+:           */
+/*   safe_functions.c                                   :+:      :+:    :+:   */
 /*                                                      +:+                   */
 /*   By: odruke-s <marvin@42.fr>                       +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2025/06/16 15:04:13 by odruke-s       #+#    #+#                */
-/*   Updated: 2025/06/16 15:08:48 by odruke-s       ########   odam.nl        */
+/*   Updated: 2025/06/18 22:04:35 by odruke-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,53 +28,37 @@ void	safe_mutex_handle(pthread_mutex_t *mutex, t_thrhandle codes)
 
 	errmsg = NULL;
 	if (INIT == codes.pthcode)
-	{
-		// printf("created mutex:%p \n", (void *)mutex);
-		errmsg =  mutex_error(pthread_mutex_init(mutex, NULL));
-	}
-
+		errmsg = mutex_error(pthread_mutex_init(mutex, NULL));
 	else if (LOCK == codes.pthcode)
-	{
-		errmsg =  mutex_error(pthread_mutex_lock(mutex));
-		// printf("mutex: %p lock\n", (void *)mutex);
-		// printf("mutex is locked\n");
-	}
+		errmsg = mutex_error(pthread_mutex_lock(mutex));
 	else if (UNLOCK == codes.pthcode)
-	{
-		errmsg =  mutex_error(pthread_mutex_unlock(mutex));
-		// printf("mutex: %p unlock\n", (void *)mutex);
-		// printf("mutex is unlocked\n");
-	}
+		errmsg = mutex_error(pthread_mutex_unlock(mutex));
 	else if (DESTROY == codes.pthcode)
-	{
-		// printf("destroying mutex:%p \n", (void *)mutex);
-		errmsg =  mutex_error(pthread_mutex_destroy(mutex));
-	}
+		errmsg = mutex_error(pthread_mutex_destroy(mutex));
 	else
-		error_handle(ERR_MUTEX, (t_errarg){"Bad t_pthcode code", codes.file, codes.line, KILL});
+		error_handle(ERR_MUTEX,
+			(t_errarg){"Bad t_pthcode code", codes.file, codes.line, KILL});
 	if (errmsg)
-		error_handle(ERR_MUTEX, (t_errarg){errmsg, codes.file, codes.line, KILL});
-
+		error_handle(ERR_MUTEX,
+			(t_errarg){errmsg, codes.file, codes.line, KILL});
 }
 
-void safe_thread_handle(pthread_t *thread, void *(*f)(void *), void *data, t_thrhandle codes)
+void	safe_thread_handle(pthread_t *thread,
+		void *(*f)(void *), void *data, t_thrhandle codes)
 {
 	char	*errmsg;
 
 	errmsg = NULL;
 	if (codes.pthcode == CREATE)
-	{
-		errmsg = thread_error(pthread_create(thread, NULL, f, data), codes.pthcode);
-		// printf("created thread:%p\n", (void *)thread);
-	}
-
+		errmsg = thread_error(pthread_create(thread,
+					NULL, f, data), codes.pthcode);
 	else if (codes.pthcode == JOIN)
-	{
-		errmsg = thread_error(pthread_join(*thread, NULL), codes.pthcode);//revisar
-		// printf("join thread:%p\n", (void *)thread);
-	}
+		errmsg = thread_error(pthread_join(*thread, NULL),
+				codes.pthcode);
 	else
-		error_handle(ERR_THREAD, (t_errarg){"Bad t_pthcode code", codes.file, codes.line, KILL});
+		error_handle(ERR_THREAD,
+			(t_errarg){"Bad t_pthcode code", codes.file, codes.line, KILL});
 	if (errmsg)
-		error_handle(ERR_THREAD, (t_errarg){errmsg, codes.file, codes.line, KILL});
+		error_handle(ERR_THREAD,
+			(t_errarg){errmsg, codes.file, codes.line, KILL});
 }

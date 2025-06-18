@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                         ::::::::           */
-/*   init.c                                              :+:    :+:           */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                      +:+                   */
 /*   By: odruke-s <marvin@42.fr>                       +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2025/06/16 13:25:20 by odruke-s       #+#    #+#                */
-/*   Updated: 2025/06/16 13:29:57 by odruke-s       ########   odam.nl        */
+/*   Updated: 2025/06/18 21:29:07 by odruke-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	init_philo(t_data *data)
 		data->philos[i].data = data;
 		data->philos[i].last_meal_time = 0;
 		safe_mutex_handle(&data->philos[i].philo_mutex,
-			(t_thrhandle){INIT, __FILE__, __LINE__});//revisar
+			(t_thrhandle){INIT, __FILE__, __LINE__});
 		assign_forks(&data->philos[i], data->forks, i, data->nb_philos);
 	}
 }

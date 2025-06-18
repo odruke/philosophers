@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                         ::::::::           */
-/*   print_functions.c                                   :+:    :+:           */
+/*   print_functions.c                                  :+:      :+:    :+:   */
 /*                                                      +:+                   */
 /*   By: odruke-s <marvin@42.fr>                       +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2025/06/16 13:41:40 by odruke-s       #+#    #+#                */
-/*   Updated: 2025/06/16 13:47:49 by odruke-s       ########   odam.nl        */
+/*   Updated: 2025/06/18 22:32:52 by odruke-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,7 @@ void	print_status(t_philo *philo, t_philo_status status)
 	data = philo->data;
 	if (philo->is_full || get_bool(&data->data_mutex, &data->end_sim))
 		return ;
-	elapsed_time = (get_time(MICROSECOND) - data->start_sim);//try get_time in milisec and start sim /1000
-	elapsed_time /= 1000;
+	elapsed_time = (get_time(MILISECOND) - data->start_sim / 1000);
 	safe_mutex_handle(&data->print_mutex,
 		(t_thrhandle){LOCK, __FILE__, __LINE__});
 	if (status == TAKE_FORK)

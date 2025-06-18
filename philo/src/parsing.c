@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-static bool	check_min_time_to(t_data *data, char **av)
+static void	check_min_time_to(t_data *data, char **av)
 {
 	bool	state;
 
@@ -35,7 +35,8 @@ static bool	check_min_time_to(t_data *data, char **av)
 			(t_errarg){"time to sleep", av[4], 0, CONTINUE});
 		state = false;
 	}
-	return (state);
+	if (!state)
+		error_handle(ERR_VOID, (t_errarg){"", "", 0, KILL});
 }
 
 void	parsing(t_data *data, char **av)
@@ -64,8 +65,7 @@ void	parsing(t_data *data, char **av)
 	}
 	else
 		data->limit_meals = -1;
-	if (!check_min_time_to(data, av))
-		error_handle(ERR_VOID, (t_errarg){"", "", 0, KILL});
+	check_min_time_to(data, av);
 }
 
 void	input_validation(int ac, char **av)
