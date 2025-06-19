@@ -110,6 +110,7 @@ void	start_simulation(t_data *data)
 	int	i;
 
 	i = -1;
+	data->philos_ready = true;
 	if (!data->limit_meals)
 		return ;
 	else if (data->nb_philos == 1)
@@ -118,7 +119,6 @@ void	start_simulation(t_data *data)
 			(t_thrhandle){CREATE, __FILE__, __LINE__});
 	else
 		launch_philos(data);
-	set_long(&data->data_mutex, &data->start_sim, get_time(MICROSECOND));
 	set_bool(&data->data_mutex, &data->philos_ready, true);
 	safe_thread_handle(&data->monitor, death_monitor, data,
 		(t_thrhandle){CREATE, __FILE__, __LINE__});
